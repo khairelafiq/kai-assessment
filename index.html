@@ -12,8 +12,8 @@
     .header-sub { color: #888; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.15rem; }
     .header-title { color: #f5f2ee; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
     .header-title em { font-weight: 400; color: #aaa; }
-   .chat-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; }
-   .messages { flex: 1; margin-bottom: 1rem; overflow-y: auto; min-height: 0; }
+    .chat-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .messages { flex: 1; margin-bottom: 1rem; overflow-y: auto; min-height: 0; }
     .msg { display: flex; margin-bottom: 1rem; }
     .msg.user { justify-content: flex-end; }
     .avatar { width: 28px; height: 28px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #f5f2ee; margin-right: 0.6rem; flex-shrink: 0; margin-top: 0.1rem; letter-spacing: 0.05em; font-weight: 500; }
@@ -30,22 +30,6 @@
     .send-btn { background: #1a1a1a; color: #f5f2ee; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1rem; flex-shrink: 0; transition: all 0.2s; }
     .send-btn:disabled { background: #e0dbd4; color: #999; cursor: default; }
     .disclaimer { text-align: center; color: #bbb; font-size: 0.7rem; margin-top: 0.8rem; letter-spacing: 0.05em; }
-    .result-wrap { max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
-    .result-header { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; margin-bottom: 1.5rem; }
-    .result-header-sub { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 0.5rem; }
-    .result-header-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
-    .section-card { background: #fff; border: 1px solid #e8e4df; border-radius: 4px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
-    .section-label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; padding-bottom: 0.8rem; border-bottom: 1px solid #f0ece6; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
-    .section-body p { font-size: 0.88rem; color: #333; line-height: 1.7; margin-bottom: 0.4rem; }
-    .exercise-item { background: #faf8f5; border: 1px solid #e8e4df; border-left: 3px solid #1a1a1a; padding: 0.9rem 1rem; margin-bottom: 0.6rem; border-radius: 0 2px 2px 0; }
-    .exercise-name { font-weight: 600; font-size: 0.9rem; color: #1a1a1a; margin-bottom: 0.2rem; }
-    .exercise-detail { font-size: 0.83rem; color: #555; line-height: 1.5; }
-    .cta-box { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; text-align: center; }
-    .cta-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
-    .cta-sub { color: #aaa; font-size: 0.85rem; margin-bottom: 1rem; }
-    .cta-url { font-size: 0.8rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
-    .disclaimer-box { background: #fdf8f3; border: 1px solid #f0e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #7a5c3a; line-height: 1.6; }
-    .reset-btn { display: block; width: 100%; margin-top: 1rem; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; }
     .new-btn { background: none; border: 1px solid #444; color: #aaa; padding: 0.4rem 0.9rem; font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; }
   </style>
 </head>
@@ -67,8 +51,6 @@
   </div>
   <p class="disclaimer">For educational purposes only · Not a diagnosis · Always see a physio</p>
 </div>
-
-<div class="result-wrap" id="resultWrap" style="display:none"></div>
 
 <script>
 const SYSTEM_PROMPT = `You are an advanced MSK clinical AI assistant built on the knowledge of Kai, a physiotherapist based in Wollongong, Australia. You conduct a structured but conversational clinical assessment to help people understand their musculoskeletal pain.
@@ -331,38 +313,7 @@ function showResult(text) {
   window.open(url, '_blank');
 }
 
-  const sections = parseAssessment(text);
-  const keys = Object.keys(sectionConfig);
-
-  const cardsHTML = keys.filter(k => sections[k]).map(key => {
-    const { icon, color } = sectionConfig[key];
-    return `
-      <div class="section-card">
-        <div class="section-label" style="color:${color}">${icon} ${key}</div>
-        <div class="section-body">${renderSection(key, sections[key])}</div>
-      </div>`;
-  }).join("");
-
-  document.getElementById("resultWrap").innerHTML = `
-    <div class="result-header">
-      <div class="result-header-sub">Assessment Complete</div>
-      <div class="result-header-title">Your MSK Pain Report</div>
-    </div>
-    ${cardsHTML}
-    ${sections["DISCLAIMER"] ? `<div class="disclaimer-box">${sections["DISCLAIMER"]}</div>` : ""}
-    <div class="cta-box">
-      <div class="cta-title">Want a proper assessment?</div>
-      <div class="cta-sub">Book with Kai for a full in-person or telehealth consultation.</div>
-      <div class="cta-url">obsidianphysiotherapy.au</div>
-    </div>
-    <button class="reset-btn" onclick="resetChat()">Start a new assessment</button>
-  `;
-}
-
 function resetChat() {
-  document.getElementById("chatWrap").style.display = "flex";
-  document.getElementById("resultWrap").style.display = "none";
-  document.getElementById("newBtn").style.display = "none";
   init();
 }
 
