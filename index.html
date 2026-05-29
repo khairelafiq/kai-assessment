@@ -268,9 +268,68 @@ function renderSection(key, value) {
 }
 
 function showResult(text) {
-  document.getElementById("chatWrap").style.display = "none";
-  document.getElementById("resultWrap").style.display = "block";
-  document.getElementById("newBtn").style.display = "block";
+  const sections = parseAssessment(text);
+  const keys = Object.keys(sectionConfig);
+
+  const cardsHTML = keys.filter(k => sections[k]).map(key => {
+    const { icon, color } = sectionConfig[key];
+    return `
+      <div class="section-card">
+        <div class="section-label" style="color:${color}">${icon} ${key}</div>
+        <div class="section-body">${renderSection(key, sections[key])}</div>
+      </div>`;
+  }).join("");
+
+  const reportHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K(AI) Assessment Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0ece6; font-family: 'DM Sans', sans-serif; padding: 1.5rem 1rem 4rem; }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    .result-header { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; margin-bottom: 1.5rem; }
+    .result-header-sub { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 0.5rem; }
+    .result-header-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+    .section-card { background: #fff; border: 1px solid #e8e4df; border-radius: 4px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+    .section-label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; padding-bottom: 0.8rem; border-bottom: 1px solid #f0ece6; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-body p { font-size: 0.88rem; color: #333; line-height: 1.7; margin-bottom: 0.4rem; }
+    .exercise-item { background: #faf8f5; border: 1px solid #e8e4df; border-left: 3px solid #1a1a1a; padding: 0.9rem 1rem; margin-bottom: 0.6rem; border-radius: 0 2px 2px 0; }
+    .exercise-name { font-weight: 600; font-size: 0.9rem; color: #1a1a1a; margin-bottom: 0.2rem; }
+    .exercise-detail { font-size: 0.83rem; color: #555; line-height: 1.5; }
+    .cta-box { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; text-align: center; margin-bottom: 1rem; }
+    .cta-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .cta-sub { color: #aaa; font-size: 0.85rem; margin-bottom: 1rem; }
+    .cta-url { font-size: 0.8rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
+    .disclaimer-box { background: #fdf8f3; border: 1px solid #f0e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #7a5c3a; line-height: 1.6; }
+    .new-btn { display: block; width: 100%; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; text-align: center; text-decoration: none; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="result-header">
+      <div class="result-header-sub">Assessment Complete</div>
+      <div class="result-header-title">Your MSK Pain Report</div>
+    </div>
+    ${cardsHTML}
+    ${sections["DISCLAIMER"] ? `<div class="disclaimer-box">${sections["DISCLAIMER"]}</div>` : ""}
+    <div class="cta-box">
+      <div class="cta-title">Want a proper assessment?</div>
+      <div class="cta-sub">Book with Kai for a full in-person or telehealth consultation.</div>
+      <div class="cta-url">obsidianphysiotherapy.au</div>
+    </div>
+    <a href="https://kai-assessment-eight.vercel.app" class="new-btn">Start a new assessment</a>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([reportHTML], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+}
 
   const sections = parseAssessment(text);
   const keys = Object.keys(sectionConfig);
