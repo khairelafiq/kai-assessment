@@ -7,13 +7,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #f0ece6; font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    body { background: #f0ece6; font-family: 'DM Sans', sans-serif; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
     .header { background: #1a1a1a; padding: 1rem 1.5rem; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
     .header-sub { color: #888; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.15rem; }
     .header-title { color: #f5f2ee; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
     .header-title em { font-weight: 400; color: #aaa; }
-    .chat-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; }
-    .messages { flex: 1; margin-bottom: 1rem; }
+   .chat-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; }
+   .messages { flex: 1; margin-bottom: 1rem; overflow-y: auto; min-height: 0; }
     .msg { display: flex; margin-bottom: 1rem; }
     .msg.user { justify-content: flex-end; }
     .avatar { width: 28px; height: 28px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #f5f2ee; margin-right: 0.6rem; flex-shrink: 0; margin-top: 0.1rem; letter-spacing: 0.05em; font-weight: 500; }
