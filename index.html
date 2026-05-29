@@ -308,9 +308,8 @@ function showResult(text) {
 </body>
 </html>`;
 
-  const blob = new Blob([reportHTML], { type: 'text/html' });
-  const url = URL.createObjectURL(blob);
-  window.open(url, '_blank');
+  sessionStorage.setItem("kai_report", text);
+window.location.href = "/report";
 }
 
 function resetChat() {
