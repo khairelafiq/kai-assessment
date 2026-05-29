@@ -47,18 +47,6 @@
     .disclaimer-box { background: #fdf8f3; border: 1px solid #f0e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #7a5c3a; line-height: 1.6; }
     .reset-btn { display: block; width: 100%; margin-top: 1rem; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; }
     .new-btn { background: none; border: 1px solid #444; color: #aaa; padding: 0.4rem 0.9rem; font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; }
-    @media (max-width: 768px) {
-  .fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100dvh;
-    z-index: 99999;
-    background: #f0ece6;
-    display: flex;
-    flex-direction: column;
-  }
   </style>
 </head>
 <body>
@@ -320,24 +308,6 @@ function resetChat() {
 }
 
 init();
-  // Mobile fullscreen on focus
-const inputEl = document.getElementById('input');
-inputEl.addEventListener('focus', () => {
-  if (window.innerWidth <= 768) {
-    document.body.classList.add('fullscreen');
-    setTimeout(() => {
-      bottomRef && bottomRef.scrollIntoView
-        ? bottomRef.scrollIntoView({ behavior: 'smooth' })
-        : document.getElementById('messages').scrollTop = 99999;
-    }, 300);
-  }
-});
-
-inputEl.addEventListener('blur', () => {
-  if (window.innerWidth <= 768) {
-    document.body.classList.remove('fullscreen');
-  }
-});
 </script>
 </body>
 </html>
