@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K(AI) Assessment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0ece6; font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    .header { background: #1a1a1a; padding: 1rem 1.5rem; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; }
+    .header-sub { color: #888; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.15rem; }
+    .header-title { color: #f5f2ee; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+    .header-title em { font-weight: 400; color: #aaa; }
+    .chat-wrap { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; }
+    .messages { flex: 1; margin-bottom: 1rem; }
+    .msg { display: flex; margin-bottom: 1rem; }
+    .msg.user { justify-content: flex-end; }
+    .avatar { width: 28px; height: 28px; background: #1a1a1a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #f5f2ee; margin-right: 0.6rem; flex-shrink: 0; margin-top: 0.1rem; letter-spacing: 0.05em; font-weight: 500; }
+    .bubble { max-width: 85%; padding: 0.9rem 1.1rem; font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; }
+    .bubble.ai { background: #fff; color: #1a1a1a; border-radius: 12px 12px 12px 2px; border: 1px solid #ede9e3; box-shadow: 0 1px 8px rgba(0,0,0,0.06); }
+    .bubble.user { background: #1a1a1a; color: #f5f2ee; border-radius: 12px 12px 2px 12px; }
+    .typing { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; }
+    .dot { width: 6px; height: 6px; background: #bbb; border-radius: 50%; animation: bounce 1.2s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+    .input-wrap { background: #fff; border: 1px solid #e0dbd4; border-radius: 12px; padding: 0.6rem 0.6rem 0.6rem 1rem; display: flex; align-items: flex-end; gap: 0.5rem; box-shadow: 0 2px 16px rgba(0,0,0,0.06); }
+    textarea { flex: 1; border: none; outline: none; font-size: 0.92rem; font-family: 'DM Sans', sans-serif; color: #1a1a1a; background: transparent; resize: none; line-height: 1.5; max-height: 120px; overflow-y: auto; padding: 0.3rem 0; }
+    .send-btn { background: #1a1a1a; color: #f5f2ee; border: none; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 1rem; flex-shrink: 0; transition: all 0.2s; }
+    .send-btn:disabled { background: #e0dbd4; color: #999; cursor: default; }
+    .disclaimer { text-align: center; color: #bbb; font-size: 0.7rem; margin-top: 0.8rem; letter-spacing: 0.05em; }
+    .result-wrap { max-width: 680px; width: 100%; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+    .result-header { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; margin-bottom: 1.5rem; }
+    .result-header-sub { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 0.5rem; }
+    .result-header-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+    .section-card { background: #fff; border: 1px solid #e8e4df; border-radius: 4px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+    .section-label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; padding-bottom: 0.8rem; border-bottom: 1px solid #f0ece6; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+    .section-body p { font-size: 0.88rem; color: #333; line-height: 1.7; margin-bottom: 0.4rem; }
+    .exercise-item { background: #faf8f5; border: 1px solid #e8e4df; border-left: 3px solid #1a1a1a; padding: 0.9rem 1rem; margin-bottom: 0.6rem; border-radius: 0 2px 2px 0; }
+    .exercise-name { font-weight: 600; font-size: 0.9rem; color: #1a1a1a; margin-bottom: 0.2rem; }
+    .exercise-detail { font-size: 0.83rem; color: #555; line-height: 1.5; }
+    .cta-box { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; text-align: center; }
+    .cta-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .cta-sub { color: #aaa; font-size: 0.85rem; margin-bottom: 1rem; }
+    .cta-url { font-size: 0.8rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
+    .disclaimer-box { background: #fdf8f3; border: 1px solid #f0e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #7a5c3a; line-height: 1.6; }
+    .reset-btn { display: block; width: 100%; margin-top: 1rem; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; }
+    .new-btn { background: none; border: 1px solid #444; color: #aaa; padding: 0.4rem 0.9rem; font-size: 0.75rem; cursor: pointer; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-sub">Obsidian Health</div>
+    <div class="header-title">K(AI) Assessment <em>Pro</em></div>
+  </div>
+  <button class="new-btn" id="newBtn" style="display:none" onclick="resetChat()">New Assessment</button>
+</div>
+
+<div class="chat-wrap" id="chatWrap">
+  <div class="messages" id="messages"></div>
+  <div class="input-wrap">
+    <textarea id="input" placeholder="Describe your symptoms..." rows="1" onkeydown="handleKey(event)"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+  </div>
+  <p class="disclaimer">For educational purposes only · Not a diagnosis · Always see a physio</p>
+</div>
+
+<div class="result-wrap" id="resultWrap" style="display:none"></div>
+
+<script>
+const SYSTEM_PROMPT = `You are an advanced MSK clinical AI assistant built on the knowledge of Kai, a physiotherapist based in Wollongong, Australia. You conduct a structured but conversational clinical assessment to help people understand their musculoskeletal pain.
+
+YOUR ROLE:
+- Conduct an adaptive subjective assessment through conversation
+- Ask intelligent follow-up questions based on answers
+- Narrow toward a likely tissue type
+- Provide specific but cautious exercise guidance
+- Always defer — never diagnose definitively
+
+ASSESSMENT APPROACH:
+You are conducting a progressive clinical interview. Start broad, then narrow based on responses. Ask ONE question at a time. Be conversational, direct, and human — not robotic or clinical in tone.
+
+TISSUE DIFFERENTIATION MARKERS (use these to guide your questioning):
+- Tendinopathy: pain with loading, improves with warmup, worse after rest, localised, gradual onset
+- Muscle strain/weakness: pain with contraction or stretch, weakness, specific mechanism of injury
+- Nerve: burning/shooting/pins and needles, follows dermatomal pattern, neural tension signs, worse with prolonged positions
+- Joint/articular: stiffness worse in morning, end range pain, clicking/locking, swelling
+- Central/nociplastic: widespread, unpredictable, disproportionate, correlates with stress/sleep, multiple areas, history of chronic pain
+- Mixed presentation: elements of multiple above
+
+NERVOUS SYSTEM INTEGRATION (weave in naturally, not as a separate topic):
+- Ask about stress and sleep when relevant
+- Note if pain behaviour is disproportionate to likely tissue state
+- Acknowledge nervous system contribution matter-of-factly without making it the focus
+
+CONVERSATION FLOW:
+Phase 1 (questions 1-3): Establish location, duration, onset
+Phase 2 (questions 4-6): Pain behaviour, aggravating/easing factors, 24-hour pattern
+Phase 3 (questions 7-9): Specific differentiating questions based on what you're hearing
+Phase 4 (question 10): Context — stress, sleep, activity, what they've tried
+
+After approximately 8-10 exchanges, when you have enough information, respond with ASSESSMENT_READY followed by your full assessment.
+
+ASSESSMENT FORMAT (only use when ready, start with ASSESSMENT_READY on its own line):
+ASSESSMENT_READY
+
+**PAIN SUMMARY**
+[2-3 sentences summarising what the patient described]
+
+**POSSIBLE TISSUE INVOLVEMENT**
+[List 1-3 possible tissue types with brief explanation. Always use "possible" or "likely" — never definitive. Format each as: • Possible [tissue type]: [1-2 sentence explanation]]
+
+**HOW YOUR NERVOUS SYSTEM MAY BE CONTRIBUTING**
+[1-2 sentences, matter of fact, not alarming]
+
+**YOUR EXERCISE PLAN**
+[4-6 specific exercises based on presentation. Each formatted as:
+Exercise name — sets x reps, brief instruction, why it helps]
+
+**WHAT TO AVOID**
+[2-3 brief points]
+
+**NEXT STEPS**
+[2-3 clear action points]
+
+⚠️ This assessment is for educational purposes only and does not constitute a diagnosis. Seek assessment from a qualified physiotherapist for proper diagnosis and treatment.
+
+TONE RULES:
+- Direct, calm, grounded — never robotic
+- No fluff, no fake positivity
+- Explain things like a smart clinician talking to an intelligent adult
+- Short questions — one at a time
+- Acknowledge what they say before asking next question
+- Lightly human, occasionally dry
+- Never say "Great question" or "Certainly" or any AI filler phrases`;
+
+let messages = [];
+let isLoading = false;
+
+const sectionConfig = {
+  "PAIN SUMMARY": { icon: "◉", color: "#1a1a1a" },
+  "POSSIBLE TISSUE INVOLVEMENT": { icon: "◈", color: "#2c3e50" },
+  "HOW YOUR NERVOUS SYSTEM MAY BE CONTRIBUTING": { icon: "◎", color: "#34495e" },
+  "YOUR EXERCISE PLAN": { icon: "▷", color: "#1a1a1a" },
+  "WHAT TO AVOID": { icon: "◇", color: "#7f4444" },
+  "NEXT STEPS": { icon: "→", color: "#1a4a2e" }
+};
+
+function init() {
+  const intro = "Let's figure out what's going on with your pain. I'll ask you a series of questions — answer as honestly as you can, even if it seems irrelevant. The more detail you give, the more useful this will be.\n\nWhere is your pain, and how long have you had it?";
+  messages = [{ role: "assistant", content: intro }];
+  renderMessages();
+}
+
+function renderMessages() {
+  const container = document.getElementById("messages");
+  container.innerHTML = messages.map(m => `
+    <div class="msg ${m.role === 'user' ? 'user' : 'ai'}">
+      ${m.role === 'assistant' ? '<div class="avatar">K</div>' : ''}
+      <div class="bubble ${m.role === 'user' ? 'user' : 'ai'}">${m.content}</div>
+    </div>
+  `).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const container = document.getElementById("messages");
+  const el = document.createElement("div");
+  el.className = "typing";
+  el.id = "typing";
+  el.innerHTML = '<div class="avatar">K</div><div class="bubble ai"><div style="display:flex;gap:4px;align-items:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById("typing");
+  if (el) el.remove();
+}
+
+function handleKey(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById("input");
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+
+  messages.push({ role: "user", content: text });
+  input.value = "";
+  isLoading = true;
+  document.getElementById("sendBtn").disabled = true;
+  renderMessages();
+  showTyping();
+
+  try {
+    const response = await fetch("/api/assess", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: messages,
+      }),
+    });
+
+    const data = await response.json();
+    const text_response = data.content?.map(b => b.text || "").join("\n") || "";
+
+    hideTyping();
+
+    if (text_response.includes("ASSESSMENT_READY")) {
+      const afterMarker = text_response.split("ASSESSMENT_READY")[1].trim();
+      showResult(afterMarker);
+    } else {
+      messages.push({ role: "assistant", content: text_response });
+      renderMessages();
+    }
+  } catch (e) {
+    hideTyping();
+    messages.push({ role: "assistant", content: "Something went wrong. Try sending that again." });
+    renderMessages();
+  }
+
+  isLoading = false;
+  document.getElementById("sendBtn").disabled = false;
+  document.getElementById("input").focus();
+}
+
+function parseAssessment(text) {
+  const sections = {};
+  const keys = Object.keys(sectionConfig);
+
+  keys.forEach((key, i) => {
+    const start = text.indexOf(`**${key}**`);
+    const nextKey = keys[i + 1];
+    const end = nextKey ? text.indexOf(`**${nextKey}**`) : text.indexOf("⚠️");
+    if (start !== -1) {
+      sections[key] = text.slice(start + key.length + 4, end !== -1 ? end : undefined).trim();
+    }
+  });
+
+  const disclaimerStart = text.indexOf("⚠️");
+  if (disclaimerStart !== -1) sections["DISCLAIMER"] = text.slice(disclaimerStart).trim();
+
+  return sections;
+}
+
+function renderSection(key, value) {
+  if (key === "YOUR EXERCISE PLAN") {
+    return value.split("\n").filter(l => l.trim()).map(line => {
+      if (line.includes(" — ")) {
+        const [name, ...rest] = line.split(" — ");
+        return `<div class="exercise-item"><div class="exercise-name">${name.replace(/^[•\-]\s*/, "")}</div><div class="exercise-detail">${rest.join(" — ")}</div></div>`;
+      }
+      return `<p>${line.replace(/^[•\-]\s*/, "")}</p>`;
+    }).join("");
+  }
+  return value.split("\n").filter(l => l.trim()).map(l => `<p>${l}</p>`).join("");
+}
+
+function showResult(text) {
+  document.getElementById("chatWrap").style.display = "none";
+  document.getElementById("resultWrap").style.display = "block";
+  document.getElementById("newBtn").style.display = "block";
+
+  const sections = parseAssessment(text);
+  const keys = Object.keys(sectionConfig);
+
+  const cardsHTML = keys.filter(k => sections[k]).map(key => {
+    const { icon, color } = sectionConfig[key];
+    return `
+      <div class="section-card">
+        <div class="section-label" style="color:${color}">${icon} ${key}</div>
+        <div class="section-body">${renderSection(key, sections[key])}</div>
+      </div>`;
+  }).join("");
+
+  document.getElementById("resultWrap").innerHTML = `
+    <div class="result-header">
+      <div class="result-header-sub">Assessment Complete</div>
+      <div class="result-header-title">Your MSK Pain Report</div>
+    </div>
+    ${cardsHTML}
+    ${sections["DISCLAIMER"] ? `<div class="disclaimer-box">${sections["DISCLAIMER"]}</div>` : ""}
+    <div class="cta-box">
+      <div class="cta-title">Want a proper assessment?</div>
+      <div class="cta-sub">Book with Kai for a full in-person or telehealth consultation.</div>
+      <div class="cta-url">obsidianphysiotherapy.au</div>
+    </div>
+    <button class="reset-btn" onclick="resetChat()">Start a new assessment</button>
+  `;
+}
+
+function resetChat() {
+  document.getElementById("chatWrap").style.display = "flex";
+  document.getElementById("resultWrap").style.display = "none";
+  document.getElementById("newBtn").style.display = "none";
+  init();
+}
+
+init();
+</script>
+</body>
+</html>
