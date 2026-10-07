@@ -37,6 +37,8 @@
     /* REPORT */
     .report-wrap { flex: 1; overflow-y: auto; min-height: 0; display: none; }
     .report-inner { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+    .saved-banner { background: #2c3e50; color: #f5f2ee; padding: 0.8rem 1.2rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.82rem; line-height: 1.5; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .saved-banner span { opacity: 0.8; }
     .result-header { background: #1a1a1a; color: #f5f2ee; padding: 1.5rem; border-radius: 4px; margin-bottom: 1.5rem; }
     .result-header-sub { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888; margin-bottom: 0.5rem; }
     .result-header-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
@@ -51,17 +53,22 @@
     .cta-sub { color: #aaa; font-size: 0.85rem; margin-bottom: 1rem; }
     .cta-url { font-size: 0.8rem; color: #888; letter-spacing: 0.1em; text-transform: uppercase; }
     .disclaimer-box { background: #fdf8f3; border: 1px solid #f0e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; font-size: 0.8rem; color: #7a5c3a; line-height: 1.6; }
-    .reset-btn { display: block; width: 100%; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; text-align: center; text-decoration: none; margin-top: 1rem; }
+    .screenshot-box { background: #f0f7f0; border: 1px solid #c8e0c8; border-radius: 4px; padding: 1rem 1.2rem; margin-bottom: 1rem; font-size: 0.82rem; color: #2d5a2d; line-height: 1.6; text-align: center; }
+    .screenshot-box strong { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; }
+    .screenshot-steps { text-align: left; margin-top: 0.5rem; padding-left: 1rem; }
+    .screenshot-steps li { margin-bottom: 0.2rem; }
+    .action-btns { display: flex; gap: 0.6rem; margin-top: 1rem; }
+    .reset-btn { flex: 1; background: none; border: 1px solid #d0cbc4; color: #888; padding: 0.8rem; font-size: 0.85rem; cursor: pointer; font-family: 'DM Sans', sans-serif; border-radius: 4px; text-align: center; }
   </style>
 </head>
 <body>
 
 <div class="header">
   <div>
-    <div class="header-sub">Obsidian Physiotherapy</div>
+    <div class="header-sub">Obsidian Health</div>
     <div class="header-title" id="headerTitle">K(AI) Assessment <em>Pro</em></div>
   </div>
-  <button class="new-btn" id="newBtn" style="display:none" onclick="resetChat()">New Assessment</button>
+  <button class="new-btn" id="newBtn" style="display:none" onclick="confirmReset()">New Assessment</button>
 </div>
 
 <div class="chat-wrap" id="chatWrap">
@@ -88,7 +95,22 @@ YOUR ROLE:
 - Always defer — never diagnose definitively
 
 ASSESSMENT APPROACH:
-You are conducting a progressive clinical interview. Start broad, then narrow based on responses. Ask ONE question at a time. Be conversational, direct, and human — not robotic or clinical in tone.
+You are conducting a progressive clinical interview. Start broad, then narrow. Ask ONE question at a time. Keep questions SHORT and SPECIFIC — give the person a clear sense of what kind of answer you need. Where helpful, offer examples or options inline (e.g. "Is it sharp, dull, aching or burning?"). Avoid open-ended vague questions that require clinical knowledge to answer.
+
+GOOD question examples:
+- "Where exactly is the pain — lower back, mid back, or both?"
+- "Does it feel sharp, dull, aching or burning?"
+- "Is it worse in the morning, end of day, or pretty constant?"
+- "Does it come on during activity, after activity, or both?"
+- "On a scale of 1–10, what's your average pain level day to day?"
+- "Does it travel anywhere — down your leg, into your hip, or does it stay local?"
+- "Does walking or gentle movement help, or make it worse?"
+- "How is your sleep and stress been lately — good, average or rough?"
+
+BAD question examples (too vague, avoid these):
+- "Can you describe the behaviour of your pain?"
+- "What aggravates and eases your symptoms?"
+- "How would you characterise the nature of your discomfort?"
 
 TISSUE DIFFERENTIATION MARKERS (use these to guide your questioning):
 - Tendinopathy: pain with loading, improves with warmup, worse after rest, localised, gradual onset
@@ -98,16 +120,16 @@ TISSUE DIFFERENTIATION MARKERS (use these to guide your questioning):
 - Central/nociplastic: widespread, unpredictable, disproportionate, correlates with stress/sleep, multiple areas, history of chronic pain
 - Mixed presentation: elements of multiple above
 
-NERVOUS SYSTEM INTEGRATION (weave in naturally, not as a separate topic):
-- Ask about stress and sleep when relevant
-- Note if pain behaviour is disproportionate to likely tissue state
-- Acknowledge nervous system contribution matter-of-factly without making it the focus
+NERVOUS SYSTEM INTEGRATION (weave in naturally):
+- Ask about stress and sleep using simple language
+- Note if pain behaviour seems disproportionate to likely tissue state
+- Acknowledge nervous system contribution matter-of-factly, not as a big deal
 
 CONVERSATION FLOW:
-Phase 1 (questions 1-3): Establish location, duration, onset
-Phase 2 (questions 4-6): Pain behaviour, aggravating/easing factors, 24-hour pattern
-Phase 3 (questions 7-9): Specific differentiating questions based on what you're hearing
-Phase 4 (question 10): Context — stress, sleep, activity, what they've tried
+Phase 1 (questions 1-3): Location, duration, onset — specific and simple
+Phase 2 (questions 4-6): Pain behaviour — use guided options, not open questions
+Phase 3 (questions 7-9): Tissue-specific differentiating questions
+Phase 4 (question 10): Context — sleep, stress, activity, what they've tried
 
 After approximately 8-10 exchanges, when you have enough information, respond with ASSESSMENT_READY followed by your full assessment.
 
@@ -157,7 +179,16 @@ const sectionConfig = {
 };
 
 function init() {
-  const intro = "Let's figure out what's going on with your pain. I'll ask you a series of questions — answer as honestly as you can, even if it seems irrelevant. The more detail you give, the more useful this will be.\n\nWhere is your pain, and how long have you had it?";
+  // Check for saved report first
+  try {
+    const saved = localStorage.getItem("kai_report");
+    if (saved) {
+      showResult(saved, true);
+      return;
+    }
+  } catch(e) {}
+
+  const intro = "Let's figure out what's going on with your pain. I'll ask you a series of short questions — just answer as best you can.\n\nFirst up: where is your pain, and how long have you had it?";
   messages = [{ role: "assistant", content: intro }];
   renderMessages();
 }
@@ -226,7 +257,8 @@ async function sendMessage() {
 
     if (text_response.includes("ASSESSMENT_READY")) {
       const afterMarker = text_response.split("ASSESSMENT_READY")[1].trim();
-      showResult(afterMarker);
+      try { localStorage.setItem("kai_report", afterMarker); } catch(e) {}
+      showResult(afterMarker, false);
     } else {
       messages.push({ role: "assistant", content: text_response });
       renderMessages();
@@ -270,7 +302,33 @@ function renderSection(key, value) {
   return value.split("\n").filter(l => l.trim()).map(l => `<p>${l}</p>`).join("");
 }
 
-function showResult(text) {
+function getScreenshotInstructions() {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad/i.test(ua)) {
+    return `<strong>📱 Save your report on iPhone/iPad</strong>
+      <ol class="screenshot-steps">
+        <li>Press <strong>Side button + Volume Up</strong> at the same time</li>
+        <li>Tap the preview in the bottom left to expand</li>
+        <li>Tap <strong>Done → Save to Photos</strong></li>
+      </ol>`;
+  } else if (/Android/i.test(ua)) {
+    return `<strong>📱 Save your report on Android</strong>
+      <ol class="screenshot-steps">
+        <li>Press <strong>Power + Volume Down</strong> at the same time</li>
+        <li>Your screenshot saves automatically to your gallery</li>
+        <li>Scroll down and repeat for each section</li>
+      </ol>`;
+  } else {
+    return `<strong>💻 Save your report</strong>
+      <ol class="screenshot-steps">
+        <li>Press <strong>Ctrl+P</strong> (Windows) or <strong>Cmd+P</strong> (Mac)</li>
+        <li>Choose <strong>Save as PDF</strong> as the destination</li>
+        <li>Click <strong>Save</strong></li>
+      </ol>`;
+  }
+}
+
+function showResult(text, isRestored) {
   const sections = parseAssessment(text);
   const keys = Object.keys(sectionConfig);
 
@@ -283,19 +341,30 @@ function showResult(text) {
       </div>`;
   }).join("");
 
+  const restoredBanner = isRestored ? `
+    <div class="saved-banner">
+      <span>This is your most recent assessment. It was saved to this device.</span>
+    </div>` : "";
+
   document.getElementById("reportInner").innerHTML = `
+    ${restoredBanner}
     <div class="result-header">
       <div class="result-header-sub">Assessment Complete</div>
       <div class="result-header-title">Your MSK Pain Report</div>
     </div>
     ${cardsHTML}
     ${sections["DISCLAIMER"] ? `<div class="disclaimer-box">${sections["DISCLAIMER"]}</div>` : ""}
+    <div class="screenshot-box">
+      ${getScreenshotInstructions()}
+    </div>
     <div class="cta-box">
       <div class="cta-title">Want a proper assessment?</div>
       <div class="cta-sub">Book with Kai for a full in-person or telehealth consultation.</div>
       <div class="cta-url">obsidianphysiotherapy.au</div>
     </div>
-    <button class="reset-btn" onclick="resetChat()">Start a new assessment</button>
+    <div class="action-btns">
+      <button class="reset-btn" onclick="confirmReset()">Start a new assessment</button>
+    </div>
   `;
 
   document.getElementById("chatWrap").style.display = "none";
@@ -305,12 +374,22 @@ function showResult(text) {
   document.getElementById("headerTitle").innerHTML = 'K(AI) <em>Report</em>';
 }
 
+function confirmReset() {
+  if (confirm("Start a new assessment? Your current report will be cleared.")) {
+    resetChat();
+  }
+}
+
 function resetChat() {
+  try { localStorage.removeItem("kai_report"); } catch(e) {}
   document.getElementById("chatWrap").style.display = "flex";
   document.getElementById("reportWrap").style.display = "none";
   document.getElementById("newBtn").style.display = "none";
   document.getElementById("headerTitle").innerHTML = 'K(AI) Assessment <em>Pro</em>';
-  init();
+  messages = [];
+  const intro = "Let's figure out what's going on with your pain. I'll ask you a series of short questions — just answer as best you can.\n\nFirst up: where is your pain, and how long have you had it?";
+  messages = [{ role: "assistant", content: intro }];
+  renderMessages();
 }
 
 window.addEventListener('load', init);
