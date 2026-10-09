@@ -72,7 +72,14 @@
 </div>
 
 <div class="chat-wrap" id="chatWrap">
-  <div class="messages" id="messages"></div>
+  <div class="messages" id="messages">
+  <div class="msg ai">
+    <div class="avatar">K</div>
+    <div class="bubble ai">Let's figure out what's going on with your pain. I'll ask you a series of short questions — just answer as best you can.
+
+First up: where is your pain, and how long have you had it?</div>
+  </div>
+</div>
   <div class="input-wrap">
     <textarea id="input" placeholder="Describe your symptoms..." rows="1" onkeydown="handleKey(event)"></textarea>
     <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
@@ -179,7 +186,6 @@ const sectionConfig = {
 };
 
 function init() {
-  // Check for saved report first
   try {
     const saved = localStorage.getItem("kai_report");
     if (saved) {
@@ -190,6 +196,7 @@ function init() {
 
   const intro = "Let's figure out what's going on with your pain. I'll ask you a series of short questions — just answer as best you can.\n\nFirst up: where is your pain, and how long have you had it?";
   messages = [{ role: "assistant", content: intro }];
+}
   renderMessages();
 }
 
