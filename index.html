@@ -146,7 +146,7 @@ ASSESSMENT_READY
 [1-2 sentences, matter of fact, not alarming]
 
 **YOUR EXERCISE PLAN**
-[4-6 specific exercises based on presentation. Each formatted as:
+[3-4 specific exercises based on presentation. Each formatted as:
 Exercise name — sets x reps, brief instruction, why it helps]
 
 **WHAT TO AVOID**
@@ -294,12 +294,12 @@ function renderSection(key, value) {
     return value.split("\n").filter(l => l.trim()).map(line => {
       if (line.includes(" — ")) {
         const [name, ...rest] = line.split(" — ");
-        return `<div class="exercise-item"><div class="exercise-name">${name.replace(/^[•\-]\s*/, "")}</div><div class="exercise-detail">${rest.join(" — ")}</div></div>`;
+        return `<div class="exercise-item"><div class="exercise-name">${name.replace(/^[•\-]\s*/, "").replace(/\*\*/g, "")}</div>
       }
       return `<p>${line.replace(/^[•\-]\s*/, "")}</p>`;
     }).join("");
   }
-  return value.split("\n").filter(l => l.trim()).map(l => `<p>${l}</p>`).join("");
+  return value.split("\n").filter(l => l.trim()).map(l => `<p>${l.replace(/\*\*/g, "")}</p>`).join("");
 }
 
 function getScreenshotInstructions() {
